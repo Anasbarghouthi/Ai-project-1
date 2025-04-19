@@ -57,6 +57,7 @@ def random_package_in_vehicles (vehicles_list,package):
      
     k=0
     while(len(package)!=0):
+        
         picked_package = random.choice(biased_list) #?chose package randomly
         #!package information 
         id=picked_package[0]
@@ -68,7 +69,7 @@ def random_package_in_vehicles (vehicles_list,package):
         fit = False
         for i in vehicles_list:
             #check if package fit 
-            if i[1] > weight:
+            if i[1] >= weight:
                 i.append([id,priority,weight,x,y])
                 i[1] -=weight
                 fit=True 
@@ -89,7 +90,9 @@ def random_package_in_vehicles (vehicles_list,package):
                     package.pop(i)
                     break
                 i +=1 
+             
         if max_capacity(vehicles_list) < min_package_weight(package):
+            
             break 
                 
             
