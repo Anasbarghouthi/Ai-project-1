@@ -1,4 +1,2 @@
-id#priority#weight#x#y
-id#priority#weight#x#y
-id#priority#weight#x#y
-id#priority#weight#x#y
+1#1#1#1#1
+1#2#1#1#1
