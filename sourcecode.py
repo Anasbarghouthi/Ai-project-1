@@ -19,7 +19,7 @@ def menu (max):
     while(True):
         capacity =input("Enter the capacity of each car \n")
         capacity = int(capacity)
-        if max < capacity:
+        if max <= capacity:
             break
         print (" the number that you entered is too small ... \n")
 
@@ -43,19 +43,21 @@ def SA (C,NV,package):  #?C == capacity , NV == number of vehicles
     for i in range(NV):
         vehicles_list.append([i+1,C])   
     random_package_in_vehicles(vehicles_list,temp_package_list)
+    print(vehicles_list)
     
 
 
-def random_package_in_vehicles (vehicles_list,package):  #?C == capacity , NV == number of vehicles
+def random_package_in_vehicles (vehicles_list,package): 
+    """this function is use for random package pick but also it is not pure random it make the property of pick higher priority more than another  """
     biased_list=[]
     table ={ 1:5 , 2:4 , 3:3 , 4:2, 5:1 } #for switch statement 
     for i in package:
         biased_list.extend ([i] * table[i[1]] )# for ex. higher priority (1) we add it 5 time 
+    
      
-
+    k=0
     while(len(package)!=0):
         picked_package = random.choice(biased_list) #?chose package randomly
-        
         #!package information 
         id=picked_package[0]
         priority =picked_package[1]
@@ -65,10 +67,12 @@ def random_package_in_vehicles (vehicles_list,package):  #?C == capacity , NV ==
         
         fit = False
         for i in vehicles_list:
+            #check if package fit 
             if i[1] > weight:
                 i.append([id,priority,weight,x,y])
                 i[1] -=weight
-                fit=True      
+                fit=True 
+                break     
         if fit:
             i=0
             end =table[priority]
@@ -86,7 +90,8 @@ def random_package_in_vehicles (vehicles_list,package):  #?C == capacity , NV ==
                     break
                 i +=1 
         if max_capacity(vehicles_list) < min_package_weight(package):
-            break           
+            break 
+                
             
         
 def max_capacity (vlist):
