@@ -51,14 +51,16 @@ def SA (C,NV,package):  #?C == capacity , NV == number of vehicles
     priority_total_cost=0
     path_list=[]
     while T > 1 :
-        for j in range(100): #from project des. 
+        for j in range(100): #from project des.
+            k=0 
             while temp_package_list :  ### test ###   
                 random_package_in_vehicles(vehicles_list,temp_package_list) # after this function vehicles list == [ id , capacity , package1,... ]
                 temp1_vehicles_list=copy.deepcopy(vehicles_list)
                 temp2_vehicles_list=copy.deepcopy(vehicles_list)       
                 path_total_cost+=path_cost(vehicles_list)
                 priority_total_cost+=priority_cost(temp1_vehicles_list)
-                path_list_f(path_list,temp2_vehicles_list)
+                path_list_f(path_list,temp2_vehicles_list,k)
+                k +=1
             if path_total_cost < old_path_cost and priority_total_cost > old_priority_cost:
                 del best_path
                 best_path=copy.deepcopy(path_list)
@@ -193,12 +195,12 @@ def priority_cost (vehicles_list):
 
 
 #? to determine the path 
-def path_list_f (path_list,vehicles_list):
+def path_list_f (path_list,vehicles_list,k):
     for i in range(len(vehicles_list)):
         while len(vehicles_list[i]) > 2 :
             v_id=vehicles_list[i][0]
             p_id=vehicles_list[i][2][0]
-            path_list.append([v_id,p_id])
+            path_list.append([v_id,p_id,k])
             vehicles_list[i].pop(2) #delete package
 
        
