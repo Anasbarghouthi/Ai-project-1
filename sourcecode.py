@@ -5,9 +5,9 @@ import random
 def load_file ():
     """ return a list of items where each item has unique id 0 also, priority 1, weight 2, x coordinate 3, y coordinate 4  """
     a=[]
-    line =open('cases.txt', 'r') 
-    for p in line :
-        templist=p.split('#') #divide each item when it ssee '#'
+    file =open('cases.txt', 'r') 
+    for line in file :
+        templist=line.split('#') #divide each item when it ssee '#'
         templist=[re.sub(r'\s',"",item)for item in templist] #remove spaces
         templist = [int(item) for item in templist]
         a.append(templist)
@@ -45,7 +45,7 @@ def SA (C,NV,package):  #?C == capacity , NV == number of vehicles
     best_path=[404]
     vehicles_list=[]
     for i in range(NV): # NV number of vehicles 
-        vehicles_list.append([i+1,C])  # [ id , capacity ] 
+        vehicles_list.append([i+1,C])  # [ id , capacity ]     
     #!#11111111
     path_total_cost=0
     priority_total_cost=0
