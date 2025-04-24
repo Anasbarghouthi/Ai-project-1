@@ -37,13 +37,32 @@ def GA (C,NV,package): #?C == capacity , NV == number of vehicles
 
  
 #!############################       SA
-def SA (C,NV,package):  #?C == capacity , NV == number of vehicles 
+def SA (C,NV,package):  #?C == capacity , NV == number of vehicles
     temp_package_list=copy.deepcopy(package)
+    old_priority_cost=0
+    old_path_cost=10000000000
     vehicles_list=[]
-    for i in range(NV):
-        vehicles_list.append([i+1,C])   
-    random_package_in_vehicles(vehicles_list,temp_package_list)
-    print(vehicles_list)
+    for i in range(NV): # NV number of vehicles 
+        vehicles_list.append([i+1,C])  # [ id , capacity ] 
+    #!#11111111
+    #path_total_cost=0
+    #priority_total_cost=0
+    path_list=[]  
+    while temp_package_list :  ### test ###   
+        random_package_in_vehicles(vehicles_list,temp_package_list) # after this function vehicles list == [ id , capacity , package1,... ]
+        temp1_vehicles_list=copy.deepcopy(vehicles_list)
+        temp2_vehicles_list=copy.deepcopy(vehicles_list)       
+        path_total_cost=path_cost(vehicles_list)
+        priority_total_cost=priority_cost(temp1_vehicles_list)
+        path_list_f(path_list,temp2_vehicles_list)
+        
+        
+
+
+        #? determine is it better than last solution or not 
+    
+    
+
     
 
 
@@ -69,12 +88,12 @@ def random_package_in_vehicles (vehicles_list,package):
         fit = False
         for i in vehicles_list:
             #check if package fit 
-            if i[1] >= weight:
+            if i[1] >= weight: 
                 i.append([id,priority,weight,x,y])
                 i[1] -=weight
                 fit=True 
                 break     
-        if fit:
+        if fit: # so delete it 
             i=0
             end =table[priority]
             while end!=0:
@@ -91,10 +110,9 @@ def random_package_in_vehicles (vehicles_list,package):
                     break
                 i +=1 
              
-        if max_capacity(vehicles_list) < min_package_weight(package):
-            
+        if max_capacity(vehicles_list) < min_package_weight(package): # all vehicles can't carry any remaining package   
             break 
-                
+               
             
         
 def max_capacity (vlist):
@@ -110,7 +128,59 @@ def min_package_weight(plist):
             min=i[2]
     return min
            
-                            
+def path_cost (vehicles_list):
+    total_cost=0
+    x_old=0
+    y_old=0
+    for i in range(len(vehicles_list)):
+        while len(vehicles_list[i]) > 2 :
+            x_new=vehicles_list[i][2][3]
+            y_new=vehicles_list[i][2][4]
+            weight=vehicles_list[i][2][2]
+            vehicles_list[i][1] +=weight
+            dx=x_old-x_new  
+            dy=y_old-y_new
+            dx = dx**2   #dx^2
+            dy = dy**2   #dy^2   
+            sq=math.sqrt(dx+dy)
+            x_old = x_new
+            y_old = y_new
+            total_cost +=sq 
+            #delete package
+            vehicles_list[i].pop(2) #delete package         
+    return total_cost        
+
+def priority_cost (vehicles_list):
+    total_cost=0
+    table ={ 1:5 , 2:4 , 3:3 , 4:2, 5:1 }
+    for i in range(len(vehicles_list)):
+        while len(vehicles_list[i]) > 2 :
+            priority=vehicles_list[i][2][1]
+            total_cost +=table[priority] 
+            #delete package
+            vehicles_list[i].pop(2) #delete package         
+    return total_cost
+
+
+
+#? to determine the path 
+def path_list_f (path_list,vehicles_list):
+    for i in range(len(vehicles_list)):
+        while len(vehicles_list[i]) > 2 :
+            v_id=vehicles_list[i][0]
+            p_id=vehicles_list[i][2][0]
+            path_list.append([v_id,p_id])
+            vehicles_list[i].pop(2) #delete package
+
+       
+        
+          
+
+
+
+
+
+
 
 
                 
