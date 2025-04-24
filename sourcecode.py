@@ -160,6 +160,8 @@ def path_cost (vehicles_list):
     x_old=0
     y_old=0
     for i in range(len(vehicles_list)):
+        x_old=0
+        y_old=0
         while len(vehicles_list[i]) > 2 :
             x_new=vehicles_list[i][2][3]
             y_new=vehicles_list[i][2][4]
