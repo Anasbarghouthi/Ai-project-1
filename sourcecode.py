@@ -38,23 +38,50 @@ def GA (C,NV,package): #?C == capacity , NV == number of vehicles
  
 #!############################       SA
 def SA (C,NV,package):  #?C == capacity , NV == number of vehicles
+    T=1000
     temp_package_list=copy.deepcopy(package)
     old_priority_cost=0
     old_path_cost=10000000000
+    best_path=[404]
     vehicles_list=[]
     for i in range(NV): # NV number of vehicles 
         vehicles_list.append([i+1,C])  # [ id , capacity ] 
     #!#11111111
-    #path_total_cost=0
-    #priority_total_cost=0
-    path_list=[]  
-    while temp_package_list :  ### test ###   
-        random_package_in_vehicles(vehicles_list,temp_package_list) # after this function vehicles list == [ id , capacity , package1,... ]
-        temp1_vehicles_list=copy.deepcopy(vehicles_list)
-        temp2_vehicles_list=copy.deepcopy(vehicles_list)       
-        path_total_cost=path_cost(vehicles_list)
-        priority_total_cost=priority_cost(temp1_vehicles_list)
-        path_list_f(path_list,temp2_vehicles_list)
+    path_total_cost=0
+    priority_total_cost=0
+    path_list=[]
+    while T > 1 :
+        for j in range(100): #from project des. 
+            while temp_package_list :  ### test ###   
+                random_package_in_vehicles(vehicles_list,temp_package_list) # after this function vehicles list == [ id , capacity , package1,... ]
+                temp1_vehicles_list=copy.deepcopy(vehicles_list)
+                temp2_vehicles_list=copy.deepcopy(vehicles_list)       
+                path_total_cost+=path_cost(vehicles_list)
+                priority_total_cost+=priority_cost(temp1_vehicles_list)
+                path_list_f(path_list,temp2_vehicles_list)
+            if path_total_cost < old_path_cost and priority_total_cost > old_priority_cost:
+                del best_path
+                best_path=copy.deepcopy(path_list)
+                old_path_cost = path_total_cost
+                old_priority_cost = priority_total_cost
+            else:
+                E1 = path_total_cost - old_path_cost
+                E2 = priority_total_cost - old_priority_cost
+                if random.random() < math.exp(-E1/T) or random.random() < math.exp(-E2/T):
+                    del best_path
+                    best_path=copy.deepcopy(path_list)
+                    old_path_cost = path_total_cost
+                    old_priority_cost = priority_total_cost
+
+        T *=0.9
+    print (best_path)    
+
+        
+
+
+    
+
+
         
         
 
