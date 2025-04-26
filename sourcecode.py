@@ -94,7 +94,7 @@ def SA (C,NV,package):  #?C == capacity , NV == number of vehicles
             del path_list
             path_list=[]        
 
-        T *=0.9
+        T *=0.99
     print (best_path)    
 
         
