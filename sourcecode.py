@@ -13,21 +13,32 @@ def load_file ():
         a.append(templist)
     return a
 
-def menu (max):
-    """ return a list of information which is capacity of vehicles index 0 number of vehicles index 1 algorithm to use index 2  """
+def menu ():
+    """ return a list of information which
+    is capacity of vehicles index 0 number of 
+    vehicles index 1 
+    algorithm to use index 2  """
     #?loop for pick good capacity for all packages
     while(True):
         capacity =input("Enter the capacity of each car \n")
         capacity = int(capacity)
-        if max <= capacity:
+        if max_weight <= capacity:
             break
         print (" the number that you entered is too small ... \n")
 
     vehicles =input("Enter the number of available vehicles\n") 
     vehicles =int (vehicles)
-    print ("chose the algorithm to use \n")
-    algo = input("1.SA\n2.GA\n") #algorithm that will use 
-    algo =int (algo)
+    print ("choose the algorithm to use \n")
+    
+    while True: 
+        algo = input("1.SA\n2.GA\n") #algorithm that will use
+        algo =int (algo)
+        if (algo == 1 or algo == 2) :
+             break  
+        else :
+            print ("Wrong input , Try again !!")
+           
+        
     result =[capacity,vehicles,algo]
     return result    
 #!#############################     GA
@@ -39,7 +50,7 @@ def GA (C,NV,package): #?C == capacity , NV == number of vehicles
 #!############################       SA
 def SA (C,NV,package):  #?C == capacity , NV == number of vehicles
     T=1000
-    temp_package_list=copy.deepcopy(package)
+    #temp_package_list=copy.deepcopy(package)
     old_priority_cost=0
     old_path_cost=10000000000
     best_path=[404]
@@ -51,12 +62,17 @@ def SA (C,NV,package):  #?C == capacity , NV == number of vehicles
     priority_total_cost=0
     path_list=[]
     while T > 1 :
+       
         for j in range(100): #from project des.
-            k=0 
-            while temp_package_list :  ### test ###   
+            temp_package_list=copy.deepcopy(package)
+            
+            k=1 
+            while temp_package_list :  ### test ### 
+                
                 random_package_in_vehicles(vehicles_list,temp_package_list) # after this function vehicles list == [ id , capacity , package1,... ]
                 temp1_vehicles_list=copy.deepcopy(vehicles_list)
-                temp2_vehicles_list=copy.deepcopy(vehicles_list)       
+                temp2_vehicles_list=copy.deepcopy(vehicles_list)
+                        
                 path_total_cost+=path_cost(vehicles_list)
                 priority_total_cost+=priority_cost(temp1_vehicles_list)
                 path_list_f(path_list,temp2_vehicles_list,k)
@@ -74,19 +90,14 @@ def SA (C,NV,package):  #?C == capacity , NV == number of vehicles
                     best_path=copy.deepcopy(path_list)
                     old_path_cost = path_total_cost
                     old_priority_cost = priority_total_cost
+            del temp_package_list
+            del path_list
+            path_list=[]        
 
         T *=0.9
     print (best_path)    
 
         
-
-
-    
-
-
-        
-        
-
 
         #? determine is it better than last solution or not 
     
@@ -216,7 +227,7 @@ def path_list_f (path_list,vehicles_list,k):
 
                 
 
-#*###########################################    main    ##################################################### 
+############################################    main    ##################################################### 
 
 package =load_file () 
 max_weight =0
@@ -224,7 +235,7 @@ for product in package: #loop to know the max weight
     if product[2] > max_weight: 
         max_weight = product[2]
      
-data = menu(max_weight) # use max number of capacity validation  
+data = menu() # use max number of capacity validation
 
 if data[2] == 1:
     SA(data[0],data[1],package) #number of vehicles and it capacity 
