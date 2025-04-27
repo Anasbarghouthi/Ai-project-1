@@ -2,6 +2,43 @@ import re
 import math
 import copy
 import random
+import matplotlib.pyplot as plt
+
+
+def plot_path(vehicles_list, path_type="GA"):
+    """
+    Plot the path of vehicles (either GA or SA).
+    
+    vehicles_list: List of vehicles with their loaded packages (as [vehicle_id, capacity, package_info...])
+    path_type: The algorithm used ("GA" or "SA")
+    """
+    plt.figure(figsize=(10, 8))
+    
+    for vehicle in vehicles_list:
+        # Extract the x, y coordinates for the vehicle's path
+        x_coords = [0]  # Starting point (e.g., the depot)
+        y_coords = [0]
+        
+        for package in vehicle[2:]:
+            x_coords.append(package[3])  # x coordinate of the package
+            y_coords.append(package[4])  # y coordinate of the package
+            
+        # Close the loop by adding the depot (0,0) again at the end
+        x_coords.append(0)
+        y_coords.append(0)
+        
+        # Plot the path of the vehicle
+        plt.plot(x_coords, y_coords, marker='o', label=f'Vehicle {vehicle[0]}')
+    
+    plt.title(f'Vehicle Routes ({path_type} Solution)', fontsize=16)
+    plt.xlabel('X Coordinate', fontsize=12)
+    plt.ylabel('Y Coordinate', fontsize=12)
+    plt.legend(loc='best')
+    plt.grid(True)
+    plt.show()
+
+
+    
 def load_packages ():
     """ return a list of items where each item has unique id 0 also, priority 1, weight 2, x coordinate 3, y coordinate 4  """
     a=[]
@@ -99,7 +136,9 @@ def GA (package,vehicles_list): #?C == capacity , NV == number of vehicles
 
     print(best_solution)
     print(best_path_cost)
-    print(best_priority)            
+    print(best_priority)
+    plot_path(best_solution, path_type="GA")
+            
               
 
 
@@ -166,41 +205,38 @@ def SA (package,vehicles_list):  #?C == capacity , NV == number of vehicles
     #temp_package_list=copy.deepcopy(package)
     old_priority_cost=0
     old_path_cost=10000000000
-    best_path=[404]   
+    best_path=[]   
     path_total_cost=0
     priority_total_cost=0
-    path_list=[]
     while T > 1 :
         for j in range(100): #from project des.
             temp_package_list=copy.deepcopy(package)
             temp_vehicles_list=copy.deepcopy(vehicles_list)
-           # k=1 
+            #k=1 
             #while temp_package_list :  ### test ### 
                 
             random_package_in_vehicles(temp_vehicles_list,temp_package_list) # after this function vehicles list == [ id , capacity , package1,... ]
             temp1_vehicles_list=copy.deepcopy(temp_vehicles_list)
             temp2_vehicles_list=copy.deepcopy(temp_vehicles_list)  
-            path_total_cost+=path_cost(temp_vehicles_list)
+            path_total_cost+=path_cost(temp2_vehicles_list)
             priority_total_cost+=priority_cost(temp1_vehicles_list)
-            path_list_f(path_list,temp2_vehicles_list,k)
+            
             #k +=1
-
-            if path_total_cost < old_path_cost and priority_total_cost > old_priority_cost:
+            E1 = path_total_cost - old_path_cost  
+            E2 = old_priority_cost - priority_total_cost
+            if E1 < 0 and E2 < 0:
                 del best_path
-                best_path=copy.deepcopy(path_list)
+                best_path=copy.deepcopy(temp_vehicles_list)
                 old_path_cost = path_total_cost
                 old_priority_cost = priority_total_cost
             else:
-                E=path_total_cost - 10*priority_total_cost
-                if random.random() < math.exp(-E/T):
-                    del best_path
-                    best_path=copy.deepcopy(path_list)
+                probability = math.exp(-(E1 + E2) / T) 
+                if random.random() < probability:
+                    best_path=copy.deepcopy(temp_vehicles_list)
                     old_path_cost = path_total_cost
                     old_priority_cost = priority_total_cost
             del temp_package_list
             del temp_vehicles_list
-            del path_list
-            path_list=[]
             path_total_cost=0
             priority_total_cost=0        
 
@@ -208,6 +244,7 @@ def SA (package,vehicles_list):  #?C == capacity , NV == number of vehicles
     print (best_path)
     print (old_path_cost)
     print (old_priority_cost)
+    plot_path(best_path, path_type="SA")
         
 
         
@@ -338,12 +375,12 @@ def priority_cost (vehicles_list):
 
 
 #? to determine the path 
-def path_list_f (path_list,vehicles_list,k):
+def path_list_f (path_list,vehicles_list):
     for i in range(len(vehicles_list)):
         while len(vehicles_list[i]) > 2 :
             v_id=vehicles_list[i][0]
             p_id=vehicles_list[i][2][0]
-            path_list.append([v_id,p_id,k])
+            path_list.append([v_id,p_id])
             vehicles_list[i].pop(2) #delete package
     del vehicles_list        
 
@@ -383,3 +420,8 @@ else:
         GA(package,vehicles_list)#number of vehicles and it capacity 
 
     
+
+
+
+
+
