@@ -2,10 +2,21 @@ import re
 import math
 import copy
 import random
-def load_file ():
+def load_packages ():
     """ return a list of items where each item has unique id 0 also, priority 1, weight 2, x coordinate 3, y coordinate 4  """
     a=[]
     file =open('cases.txt', 'r') 
+    for line in file :
+        templist=line.split('#') #divide each item when it ssee '#'
+        templist=[re.sub(r'\s',"",item)for item in templist] #remove spaces
+        templist = [int(item) for item in templist]
+        a.append(templist)
+    return a
+
+def load_vehicles ():
+    """ return a list of items where each item has unique id 0 also, priority 1, weight 2, x coordinate 3, y coordinate 4  """
+    a=[]
+    file =open('vehicles.txt', 'r') 
     for line in file :
         templist=line.split('#') #divide each item when it ssee '#'
         templist=[re.sub(r'\s',"",item)for item in templist] #remove spaces
@@ -19,16 +30,6 @@ def menu ():
     vehicles index 1 
     algorithm to use index 2  """
     #?loop for pick good capacity for all packages
-    while(True):
-        capacity =input("Enter the capacity of each car \n")
-        capacity = int(capacity)
-        if max_weight <= capacity:
-            break
-        print (" the number that you entered is too small ... \n")
-
-    vehicles =input("Enter the number of available vehicles\n") 
-    vehicles =int (vehicles)
-    print ("choose the algorithm to use \n")
     
     while True: 
         algo = input("1.SA\n2.GA\n") #algorithm that will use
@@ -38,45 +39,38 @@ def menu ():
         else :
             print ("Wrong input , Try again !!")
            
-        
-    result =[capacity,vehicles,algo]
-    return result    
+    return algo    
 #!#############################     GA
-def GA (C,NV,package): #?C == capacity , NV == number of vehicles 
+def GA (NV,package,vehicles_list): #?C == capacity , NV == number of vehicles 
     temp_package_list=copy.deepcopy(package)
     print ("in  GA")
 
  
 #!############################       SA
-def SA (C,NV,package):  #?C == capacity , NV == number of vehicles
+def SA (NV,package,vehicles_list):  #?C == capacity , NV == number of vehicles
     T=1000
     #temp_package_list=copy.deepcopy(package)
     old_priority_cost=0
     old_path_cost=10000000000
-    best_path=[404]
-    vehicles_list=[]
-    for i in range(NV): # NV number of vehicles 
-        vehicles_list.append([i+1,C])  # [ id , capacity ]     
-    #!#11111111
+    best_path=[404]   
     path_total_cost=0
     priority_total_cost=0
     path_list=[]
     while T > 1 :
-       
         for j in range(100): #from project des.
             temp_package_list=copy.deepcopy(package)
-            
+            temp_vehicles_list=copy.deepcopy(vehicles_list)
             k=1 
             while temp_package_list :  ### test ### 
                 
-                random_package_in_vehicles(vehicles_list,temp_package_list) # after this function vehicles list == [ id , capacity , package1,... ]
-                temp1_vehicles_list=copy.deepcopy(vehicles_list)
-                temp2_vehicles_list=copy.deepcopy(vehicles_list)
-                        
-                path_total_cost+=path_cost(vehicles_list)
+                random_package_in_vehicles(temp_vehicles_list,temp_package_list) # after this function vehicles list == [ id , capacity , package1,... ]
+                temp1_vehicles_list=copy.deepcopy(temp_vehicles_list)
+                temp2_vehicles_list=copy.deepcopy(temp_vehicles_list)  
+                path_total_cost+=path_cost(temp_vehicles_list)
                 priority_total_cost+=priority_cost(temp1_vehicles_list)
                 path_list_f(path_list,temp2_vehicles_list,k)
                 k +=1
+
             if path_total_cost < old_path_cost and priority_total_cost > old_priority_cost:
                 del best_path
                 best_path=copy.deepcopy(path_list)
@@ -91,11 +85,15 @@ def SA (C,NV,package):  #?C == capacity , NV == number of vehicles
                     old_path_cost = path_total_cost
                     old_priority_cost = priority_total_cost
             del temp_package_list
+            del temp_vehicles_list
             del path_list
-            path_list=[]        
+            path_list=[]
+            path_total_cost=0
+            priority_total_cost=0        
 
         T *=0.9
-    print (best_path)    
+    print (best_path)
+        
 
         
 
@@ -189,7 +187,20 @@ def path_cost (vehicles_list):
             y_old = y_new
             total_cost +=sq 
             #delete package
-            vehicles_list[i].pop(2) #delete package         
+            vehicles_list[i].pop(2) #delete package
+        # return to shop    
+        x_new=0
+        y_new=0
+        dx=x_old-x_new  
+        dy=y_old-y_new
+        dx = dx**2   #dx^2
+        dy = dy**2   #dy^2   
+        sq=math.sqrt(dx+dy)
+        x_old = x_new
+        y_old = y_new
+        total_cost +=sq
+
+
     return total_cost        
 
 def priority_cost (vehicles_list):
@@ -200,7 +211,8 @@ def priority_cost (vehicles_list):
             priority=vehicles_list[i][2][1]
             total_cost +=table[priority] 
             #delete package
-            vehicles_list[i].pop(2) #delete package         
+            vehicles_list[i].pop(2) #delete package
+    del vehicles_list                 
     return total_cost
 
 
@@ -213,6 +225,7 @@ def path_list_f (path_list,vehicles_list,k):
             p_id=vehicles_list[i][2][0]
             path_list.append([v_id,p_id,k])
             vehicles_list[i].pop(2) #delete package
+    del vehicles_list        
 
        
         
@@ -229,17 +242,24 @@ def path_list_f (path_list,vehicles_list,k):
 
 ############################################    main    ##################################################### 
 
-package =load_file () 
+package =load_packages ()
+vehicles_list=load_vehicles() 
 max_weight =0
 for product in package: #loop to know the max weight 
     if product[2] > max_weight: 
         max_weight = product[2]
-     
-data = menu() # use max number of capacity validation
+max_v_capacity=0
+for v in vehicles_list: #loop to know the max weight 
+    if v[1] > max_v_capacity: 
+        max_v_capacity = v[1]
+if max_v_capacity < max_weight:
+    print (" the number that you entered is too small ... \n")       
+else:     
+    algo = menu() # use max number of capacity validation
 
-if data[2] == 1:
-    SA(data[0],data[1],package) #number of vehicles and it capacity 
-else:
-    GA(data[0],data[1],package)#number of vehicles and it capacity 
+    if algo == 1:
+        SA(len(vehicles_list),package,vehicles_list) #number of vehicles and it capacity 
+    else:
+        GA(len(vehicles_list),package,vehicles_list)#number of vehicles and it capacity 
 
     
