@@ -93,6 +93,8 @@ def SA (NV,package,vehicles_list):  #?C == capacity , NV == number of vehicles
 
         T *=0.9
     print (best_path)
+    print (old_path_cost)
+    print (old_priority_cost)
         
 
         
