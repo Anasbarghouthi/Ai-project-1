@@ -174,16 +174,16 @@ def SA (package,vehicles_list):  #?C == capacity , NV == number of vehicles
         for j in range(100): #from project des.
             temp_package_list=copy.deepcopy(package)
             temp_vehicles_list=copy.deepcopy(vehicles_list)
-            k=1 
-            while temp_package_list :  ### test ### 
+           # k=1 
+            #while temp_package_list :  ### test ### 
                 
-                random_package_in_vehicles(temp_vehicles_list,temp_package_list) # after this function vehicles list == [ id , capacity , package1,... ]
-                temp1_vehicles_list=copy.deepcopy(temp_vehicles_list)
-                temp2_vehicles_list=copy.deepcopy(temp_vehicles_list)  
-                path_total_cost+=path_cost(temp_vehicles_list)
-                priority_total_cost+=priority_cost(temp1_vehicles_list)
-                path_list_f(path_list,temp2_vehicles_list,k)
-                k +=1
+            random_package_in_vehicles(temp_vehicles_list,temp_package_list) # after this function vehicles list == [ id , capacity , package1,... ]
+            temp1_vehicles_list=copy.deepcopy(temp_vehicles_list)
+            temp2_vehicles_list=copy.deepcopy(temp_vehicles_list)  
+            path_total_cost+=path_cost(temp_vehicles_list)
+            priority_total_cost+=priority_cost(temp1_vehicles_list)
+            path_list_f(path_list,temp2_vehicles_list,k)
+            #k +=1
 
             if path_total_cost < old_path_cost and priority_total_cost > old_priority_cost:
                 del best_path
@@ -222,6 +222,7 @@ def SA (package,vehicles_list):  #?C == capacity , NV == number of vehicles
 def random_package_in_vehicles (vehicles_list,package): 
     """this function is use for random package pick but also it is not pure random it make the property of pick higher priority more than another  """
     biased_list=[]
+    temp_vehi=copy.deepcopy(vehicles_list)
     table ={ 1:5 , 2:4 , 3:3 , 4:2, 5:1 } #for switch statement 
     for i in package:
         biased_list.extend ([i] * table[i[1]] )# for ex. higher priority (1) we add it 5 time 
@@ -264,6 +265,8 @@ def random_package_in_vehicles (vehicles_list,package):
                 i +=1 
              
         if max_capacity(vehicles_list) < min_package_weight(package): # all vehicles can't carry any remaining package   
+            random_package_in_vehicles (temp_vehi,package)
+            vehicles_list.extend(temp_vehi)
             break 
                
             
