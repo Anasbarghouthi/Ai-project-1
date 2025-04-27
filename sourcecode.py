@@ -41,13 +41,127 @@ def menu ():
            
     return algo    
 #!#############################     GA
-def GA (NV,package,vehicles_list): #?C == capacity , NV == number of vehicles 
+def GA (package,vehicles_list): #?C == capacity , NV == number of vehicles 
     temp_package_list=copy.deepcopy(package)
-    print ("in  GA")
+    population_size=100
+    generations=500
+    
+
+    best_solution =[]
+    best_priority=-100
+    best_path_cost=1000000
+    population=[]
+    # initial population 
+    for i in range(population_size):
+        
+        temp_package_list=copy.deepcopy(package)
+        temp_vehicles=copy.deepcopy(vehicles_list)
+        random_package_in_vehicles(temp_vehicles,temp_package_list,)
+        population.append(temp_vehicles)
+    
+    for i in range(generations):
+        
+        
+        fitness_list=[]    
+        for individual in population:
+            temp1=copy.deepcopy(individual)
+            temp2=copy.deepcopy(individual)
+            fitness= priority_cost(temp1)*1000 - path_cost(temp2) # higher is better
+            fitness_list.append(fitness)
+        
+        selected=selection(population,fitness_list,population_size//2)
+        
+        children=[]
+        while len(children) < population_size:
+            parent1=random.choice(selected)
+            parent2=random.choice(selected)
+            c=crossover(parent1,parent2,vehicles_list)
+            children.append(c)
+        i=0
+        for child in children:
+            if i%100 == 0:
+                i=0
+                mutation_function(child) 
+        
+        population=children
+
+        for i in population:
+            temp1=copy.deepcopy(i)
+            temp2=copy.deepcopy(i)
+            pri_cost=priority_cost(temp1)
+            path1_cost=path_cost(temp2)
+            if (pri_cost > best_priority and path1_cost < best_path_cost) or (pri_cost == best_priority and path1_cost < best_path_cost) or (pri_cost > best_priority and path1_cost == best_path_cost) :
+                best_path_cost=path1_cost
+                best_priority=pri_cost
+                best_solution=copy.deepcopy(i)
+
+
+
+    print(best_solution)
+    print(best_path_cost)
+    print(best_priority)            
+              
+
+
+
+
+
+
+
+
+
+
+def selection(population,fitness_list,population_size):
+    selected=[]
+    
+    for i in range(population_size):
+        
+        t=random.sample(list(zip(population,fitness_list)),5)
+        m=0
+        index=0
+        #? find max fitness value  
+        for j in range(len(t)):
+            if t[j][1]>m:
+                m=t[j][1]
+                index=j
+        selected.append(copy.deepcopy(t[index][0]))
+    return selected            
+
+def crossover (parent1,parent2,vehicles_list):
+    child=copy.deepcopy(vehicles_list)
+
+    all_packages=[]
+    for v in parent1:
+        all_packages.extend(v[2:])
+    for v in parent2:
+        all_packages.extend(v[2:])
+
+    unique_package=[]
+    
+    for p in all_packages:
+        if p not in unique_package:
+            unique_package.append(p)
+
+    random_package_in_vehicles(child,unique_package)
+    return child                 
+
+def mutation_function(child):
+        v1=random.choice(child)
+        v2=random.choice(child)
+        if v1[0] != v2[0] and len(v2) > 2 and len(v1) > 2:
+             idx1 = random.randint(2, len(v1)-1)
+             idx2 = random.randint(2, len(v2)-1)
+             v1[idx1], v2[idx2] = v2[idx2], v1[idx1]
+
+
+
+
+
+    
 
  
 #!############################       SA
-def SA (NV,package,vehicles_list):  #?C == capacity , NV == number of vehicles
+def SA (package,vehicles_list):  #?C == capacity , NV == number of vehicles
     T=1000
     #temp_package_list=copy.deepcopy(package)
     old_priority_cost=0
@@ -77,9 +191,8 @@ def SA (NV,package,vehicles_list):  #?C == capacity , NV == number of vehicles
                 old_path_cost = path_total_cost
                 old_priority_cost = priority_total_cost
             else:
-                E1 = path_total_cost - old_path_cost
-                E2 = priority_total_cost - old_priority_cost
-                if random.random() < math.exp(-E1/T) or random.random() < math.exp(-E2/T):
+                E=path_total_cost - 10*priority_total_cost
+                if random.random() < math.exp(-E/T):
                     del best_path
                     best_path=copy.deepcopy(path_list)
                     old_path_cost = path_total_cost
@@ -209,11 +322,13 @@ def priority_cost (vehicles_list):
     total_cost=0
     table ={ 1:5 , 2:4 , 3:3 , 4:2, 5:1 }
     for i in range(len(vehicles_list)):
+        j=0
         while len(vehicles_list[i]) > 2 :
             priority=vehicles_list[i][2][1]
-            total_cost +=table[priority] 
+            total_cost +=table[priority]-j
             #delete package
             vehicles_list[i].pop(2) #delete package
+            j +=1
     del vehicles_list                 
     return total_cost
 
@@ -260,8 +375,8 @@ else:
     algo = menu() # use max number of capacity validation
 
     if algo == 1:
-        SA(len(vehicles_list),package,vehicles_list) #number of vehicles and it capacity 
+        SA(package,vehicles_list) #number of vehicles and it capacity 
     else:
-        GA(len(vehicles_list),package,vehicles_list)#number of vehicles and it capacity 
+        GA(package,vehicles_list)#number of vehicles and it capacity 
 
     
