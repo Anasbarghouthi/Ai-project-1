@@ -68,10 +68,13 @@ def menu ():
     algorithm to use index 2  """
     #?loop for pick good capacity for all packages
     
-    while True: 
-        algo = input("1.SA\n2.GA\n") #algorithm that will use
+    while True:
+        print ("1. Simulating Aneling ") 
+        print ("2. Genetic  Algorithm ")
+        print ("3. Exit ")
+        algo = input("Enter on of options : ") #algorithm that will use
         algo =int (algo)
-        if (algo == 1 or algo == 2) :
+        if (algo == 1 or algo == 2 or algo == 3) :
              break  
         else :
             print ("Wrong input , Try again !!")
@@ -134,9 +137,9 @@ def GA (package,vehicles_list): #?C == capacity , NV == number of vehicles
 
 
 
-    print(best_solution)
-    print(best_path_cost)
-    print(best_priority)
+    print("best solution that Genetic solved :",best_solution)
+    print("path cost = ",best_path_cost)
+    print("priority cost =",best_priority)
     plot_path(best_solution, path_type="GA")
             
               
@@ -224,7 +227,7 @@ def SA (package,vehicles_list):  #?C == capacity , NV == number of vehicles
             #k +=1
             E1 = path_total_cost - old_path_cost  
             E2 = old_priority_cost - priority_total_cost
-            if E1 < 0 and E2 < 0:
+            if (E1 < 0 and E2 < 0) or (E1 == 0 and E2 < 0) or (E1 < 0 and E2 == 0):
                 del best_path
                 best_path=copy.deepcopy(temp_vehicles_list)
                 old_path_cost = path_total_cost
@@ -241,9 +244,9 @@ def SA (package,vehicles_list):  #?C == capacity , NV == number of vehicles
             priority_total_cost=0        
 
         T *=0.9
-    print (best_path)
-    print (old_path_cost)
-    print (old_priority_cost)
+    print ("best solution that Simulating Aneling solved :",best_path)
+    print ("path cost =",old_path_cost)
+    print ("priority cost =",old_priority_cost)
     plot_path(best_path, path_type="SA")
         
 
@@ -416,8 +419,10 @@ else:
 
     if algo == 1:
         SA(package,vehicles_list) #number of vehicles and it capacity 
-    else:
+    elif algo == 2 :
         GA(package,vehicles_list)#number of vehicles and it capacity 
+    else:
+        print ("           .......   End program  .....         ")    
 
     
 
