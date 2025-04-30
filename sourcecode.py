@@ -172,19 +172,29 @@ def selection(population,fitness_list,population_size):
 def crossover (parent1,parent2,vehicles_list):
     child=copy.deepcopy(vehicles_list)
 
-    all_packages=[]
+    all_packages1=[]
+    all_packages2=[]
     for v in parent1:
-        all_packages.extend(v[2:])
+        all_packages1.extend(v[2:])
     for v in parent2:
-        all_packages.extend(v[2:])
+        all_packages2.extend(v[2:])
+
 
     unique_package=[]
     
-    for p in all_packages:
-        if p not in unique_package:
-            unique_package.append(p)
+    
+    i=0
+    while(len(all_packages1)>i):
+        if all_packages1[i] not in unique_package:
+            unique_package.append(all_packages1[i])
+            i+=1
+        if len(all_packages2)>i and all_packages2[i] not in unique_package:
+            unique_package.append(all_packages2[i])
+            i+=1
+        else:
+            break    
 
-    random_package_in_vehicles(child,unique_package)
+    random_package_in_vehicles_GA(child,unique_package)
     return child                 
 
 def mutation_function(child):
@@ -196,7 +206,45 @@ def mutation_function(child):
              v1[idx1], v2[idx2] = v2[idx2], v1[idx1]
 
 
+def random_package_in_vehicles_GA(vehicles_list,package): 
+    """this function is use for random package pick but also it is not pure random it make the property of pick higher priority more than another  """
+    temp_vehi=copy.deepcopy(vehicles_list)
+   
+    
+     
+    
+    while(len(package)!=0):
+        
+        picked_package = package[0]
+        #!package information 
+        id=picked_package[0]
+        priority =picked_package[1]
+        weight = picked_package[2]
+        x=picked_package[3]
+        y=picked_package[4]
+        
+        fit = False
+        for i in vehicles_list:
+            #check if package fit 
+            if i[1] >= weight: 
+                i.append([id,priority,weight,x,y])
+                i[1] -=weight
+                fit=True 
+                break     
+        if fit: # so delete it        
+            i=0        
+            while len(package)!=0:
+                if package[i][0] == id :
+                    package.pop(i)
+                    break
+                i +=1 
 
+             
+        if max_capacity(vehicles_list) < min_package_weight(package): # all vehicles can't carry any remaining package   
+            random_package_in_vehicles_GA (temp_vehi,package)
+            vehicles_list.extend(temp_vehi)
+            break
+        
 
 
     
@@ -416,13 +464,15 @@ if max_v_capacity < max_weight:
     print (" the number that you entered is too small ... \n")       
 else:     
     algo = menu() # use max number of capacity validation
-
-    if algo == 1:
-        SA(package,vehicles_list) #number of vehicles and it capacity 
-    elif algo == 2 :
-        GA(package,vehicles_list)#number of vehicles and it capacity 
-    else:
-        print ("           .......   End program  .....         ")    
+    while(True):
+        if algo == 1:
+            SA(package,vehicles_list) #number of vehicles and it capacity 
+        elif algo == 2 :
+            GA(package,vehicles_list)#number of vehicles and it capacity 
+        else:
+            print ("           .......   End program  .....         ")
+            break
+        algo = menu()         
 
     
 
