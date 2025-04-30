@@ -187,14 +187,13 @@ def crossover (parent1,parent2,vehicles_list):
     while(len(all_packages1)>i):
         if all_packages1[i] not in unique_package:
             unique_package.append(all_packages1[i])
-            i+=1
         if len(all_packages2)>i and all_packages2[i] not in unique_package:
             unique_package.append(all_packages2[i])
-            i+=1
-        else:
-            break    
+         
+        i+=1
+           
 
-    random_package_in_vehicles_GA(child,unique_package)
+    random_package_in_vehicles(child,unique_package)
     return child                 
 
 def mutation_function(child):
@@ -232,15 +231,11 @@ def random_package_in_vehicles_GA(vehicles_list,package):
                 fit=True 
                 break     
         if fit: # so delete it        
-            i=0        
-            while len(package)!=0:
-                if package[i][0] == id :
-                    package.pop(i)
-                    break
-                i +=1 
+            package.pop(0)
+                 
 
              
-        if max_capacity(vehicles_list) < min_package_weight(package): # all vehicles can't carry any remaining package   
+        if max_capacity(vehicles_list) < min_package_weight(package) and len(package)!=0: # all vehicles can't carry any remaining package   
             random_package_in_vehicles_GA (temp_vehi,package)
             vehicles_list.extend(temp_vehi)
             break
@@ -352,7 +347,7 @@ def random_package_in_vehicles (vehicles_list,package):
                     break
                 i +=1 
              
-        if max_capacity(vehicles_list) < min_package_weight(package): # all vehicles can't carry any remaining package   
+        if max_capacity(vehicles_list) < min_package_weight(package) and len(package)!=0: # all vehicles can't carry any remaining package   
             random_package_in_vehicles (temp_vehi,package)
             vehicles_list.extend(temp_vehi)
             break 
@@ -412,14 +407,21 @@ def path_cost (vehicles_list):
 def priority_cost (vehicles_list):
     total_cost=0
     table ={ 1:5 , 2:4 , 3:3 , 4:2, 5:1 }
+    v_f={}
     for i in range(len(vehicles_list)):
-        j=0
+        v_f[vehicles_list[i][0]]=1
+        
+
+    for i in range(len(vehicles_list)):
+        j=v_f[vehicles_list[i][0]]
         while len(vehicles_list[i]) > 2 :
             priority=vehicles_list[i][2][1]
-            total_cost +=table[priority]-j
+            total_cost +=(table[priority]/j)
             #delete package
             vehicles_list[i].pop(2) #delete package
             j +=1
+        v_f[vehicles_list[i][0]]=j    
+
     del vehicles_list                 
     return total_cost
 
