@@ -193,7 +193,7 @@ def crossover (parent1,parent2,vehicles_list):
         i+=1
            
 
-    random_package_in_vehicles(child,unique_package)
+    random_package_in_vehicles_GA(child,unique_package)
     return child                 
 
 def mutation_function(child):
@@ -254,6 +254,7 @@ def SA (package,vehicles_list):  #?C == capacity , NV == number of vehicles
     best_path=[]   
     path_total_cost=0
     priority_total_cost=0
+    old_Energy=old_priority_cost+old_path_cost
     while T > 1 :
         for j in range(100): #from project des.
             temp_package_list=copy.deepcopy(package)
@@ -270,17 +271,21 @@ def SA (package,vehicles_list):  #?C == capacity , NV == number of vehicles
             #k +=1
             E1 = path_total_cost - old_path_cost  
             E2 = old_priority_cost - priority_total_cost
+            E3=priority_total_cost+path_total_cost
+            
             if (E1 < 0 and E2 < 0) or (E1 == 0 and E2 < 0) or (E1 < 0 and E2 == 0):
                 del best_path
                 best_path=copy.deepcopy(temp_vehicles_list)
                 old_path_cost = path_total_cost
                 old_priority_cost = priority_total_cost
+                old_Energy=E3
             else:
-                probability = math.exp(-(E1 + E2) / T) 
+                probability = math.exp((E3 - old_Energy) / T) 
                 if random.random() < probability:
                     best_path=copy.deepcopy(temp_vehicles_list)
                     old_path_cost = path_total_cost
                     old_priority_cost = priority_total_cost
+                    old_Energy=E3
             del temp_package_list
             del temp_vehicles_list
             path_total_cost=0
@@ -437,36 +442,33 @@ def path_list_f (path_list,vehicles_list):
             vehicles_list[i].pop(2) #delete package
     del vehicles_list        
 
-       
-        
-          
-
-
-
-
-
-
-
-
-                
 
 ############################################    main    ##################################################### 
 
 package =load_packages ()
 vehicles_list=load_vehicles() 
-max_weight =0
-for product in package: #loop to know the max weight 
-    if product[2] > max_weight: 
-        max_weight = product[2]
 max_v_capacity=0
 for v in vehicles_list: #loop to know the max weight 
     if v[1] > max_v_capacity: 
         max_v_capacity = v[1]
-if max_v_capacity < max_weight:
-    print (" the number that you entered is too small ... \n")       
-else:     
-    algo = menu() # use max number of capacity validation
-    while(True):
+        
+drop=[]
+for product in package: #loop to know the max weight 
+    if product[2] > max_v_capacity: 
+        print ("package ",product[0],"very heavy so it will drop ")
+        drop.append(product)
+
+while len(drop)!=0:
+    for product in package:
+        if product[0] == drop[0][0]:
+            package.remove(product)
+            break
+    drop.pop(0)
+        
+
+            
+algo = menu() # use max number of capacity validation
+while(True):
         if algo == 1:
             SA(package,vehicles_list) #number of vehicles and it capacity 
         elif algo == 2 :
