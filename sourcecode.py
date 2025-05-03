@@ -255,41 +255,61 @@ def SA (package,vehicles_list):  #?C == capacity , NV == number of vehicles
     path_total_cost=0
     priority_total_cost=0
     old_Energy=old_priority_cost+old_path_cost
-    while T > 1 :
-        for j in range(100): #from project des.
-            temp_package_list=copy.deepcopy(package)
-            temp_vehicles_list=copy.deepcopy(vehicles_list)
+    counter=0
+    next_state=[]
+    
+    
+    temp_package_list=copy.deepcopy(package)
+    temp_vehicles_list=copy.deepcopy(vehicles_list)
             #k=1 
             #while temp_package_list :  ### test ### 
                 
-            random_package_in_vehicles(temp_vehicles_list,temp_package_list) # after this function vehicles list == [ id , capacity , package1,... ]
-            temp1_vehicles_list=copy.deepcopy(temp_vehicles_list)
-            temp2_vehicles_list=copy.deepcopy(temp_vehicles_list)  
-            path_total_cost+=path_cost(temp2_vehicles_list)
-            priority_total_cost+=priority_cost(temp1_vehicles_list)
+    random_package_in_vehicles(temp_vehicles_list,temp_package_list) # after this function vehicles list == [ id , capacity , package1,... ]
+    temp1_vehicles_list=copy.deepcopy(temp_vehicles_list)
+    temp2_vehicles_list=copy.deepcopy(temp_vehicles_list)  
+    old_path_cost=path_cost(temp2_vehicles_list)
+    old_priority_cost=priority_cost(temp1_vehicles_list)
+    best_path=copy.deepcopy(temp_vehicles_list)
             
-            #k +=1
+    while T > 1 :
+        for j in range(100): #from project des.
+            counter +=1
+
+            temp_package_list=copy.deepcopy(package)
+            next_state=copy.deepcopy(temp_vehicles_list)
+            if counter % 20 == 0:
+                temp_package_list=copy.deepcopy(package)
+                next_state=copy.deepcopy(vehicles_list)
+                random_package_in_vehicles(next_state,temp_package_list)
+            else:
+                mutation_function(next_state)
+            temp1_vehicles_list=copy.deepcopy(next_state)
+            temp2_vehicles_list=copy.deepcopy(next_state)  
+            path_total_cost=path_cost(temp1_vehicles_list)
+            priority_total_cost=priority_cost(temp2_vehicles_list)
+
+
             E1 = path_total_cost - old_path_cost  
             E2 = old_priority_cost - priority_total_cost
             E3=priority_total_cost+path_total_cost
             
             if (E1 < 0 and E2 < 0) or (E1 == 0 and E2 < 0) or (E1 < 0 and E2 == 0):
                 del best_path
-                best_path=copy.deepcopy(temp_vehicles_list)
+                best_path=copy.deepcopy(next_state)
                 old_path_cost = path_total_cost
                 old_priority_cost = priority_total_cost
                 old_Energy=E3
+                temp_vehicles_list=next_state
             else:
                 probability = math.exp((E3 - old_Energy) / T) 
                 if random.random() < probability:
-                    best_path=copy.deepcopy(temp_vehicles_list)
+                    best_path=copy.deepcopy(next_state)
                     old_path_cost = path_total_cost
                     old_priority_cost = priority_total_cost
                     old_Energy=E3
-            del temp_package_list
-            del temp_vehicles_list
-            path_total_cost=0
-            priority_total_cost=0        
+                    temp_vehicles_list=next_state
+            
+                    
 
         T *=0.9
     print ("best solution that Simulating Aneling solved :",best_path)
